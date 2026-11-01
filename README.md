@@ -10,7 +10,7 @@
 
 > **Techfest Round 1: 3D Reconstruction & Roaming Submission**  
 > SpatialForge is an end-to-end, browser-accessible indoor 3D reconstruction and spatial navigation platform designed to run reliably on consumer laptop hardware (Intel Iris/UHD integrated graphics, 16 GB RAM).  
-> 🌐 **Live Public 3D Showcase Viewer**: **[https://frontend-nine-mu-97.vercel.app](https://frontend-nine-mu-97.vercel.app)** (Interactive browser roaming, real COLMAP sparse cloud & camera trajectory, zero installation required). See [docs/PUBLIC_VIEWER_DEPLOYMENT.md](docs/PUBLIC_VIEWER_DEPLOYMENT.md) for full deployment details.
+> 🌐 **Live Public 3D Showcase Viewer**: **[https://spatialforge-3d.vercel.app](https://spatialforge-3d.vercel.app)** *(Mirror: [spatialforge-viewer.vercel.app](https://spatialforge-viewer.vercel.app))* — Interactive browser roaming, real COLMAP sparse cloud & camera trajectory, zero installation required. See [docs/PUBLIC_VIEWER_DEPLOYMENT.md](docs/PUBLIC_VIEWER_DEPLOYMENT.md) for full deployment details.
 
 ---
 

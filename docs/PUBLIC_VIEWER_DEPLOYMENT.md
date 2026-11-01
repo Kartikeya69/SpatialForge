@@ -1,6 +1,8 @@
 # SpatialForge — Public Showcase 3D Viewer Deployment Guide
 
-> **Live Production URL**: **[https://frontend-nine-mu-97.vercel.app](https://frontend-nine-mu-97.vercel.app)**  
+> **Live Production URLs**:  
+> - Primary: **[https://spatialforge-3d.vercel.app](https://spatialforge-3d.vercel.app)**  
+> - Mirror: **[https://spatialforge-viewer.vercel.app](https://spatialforge-viewer.vercel.app)**  
 > **Status**: Live, public, zero-backend WebGL 3D reconstruction and roaming.
 
 ## Overview
