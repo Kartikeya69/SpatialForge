@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteSceneJob, exportSceneUrl, renameScene, validateViewerPack } from "../api";
+import { deleteSceneJob, exportSceneUrl, isShowcaseMode, renameScene, validateViewerPack } from "../api";
 import type { SceneSummary, ViewerPackValidation } from "../types";
 
 export function MyScenesView({
@@ -38,8 +38,9 @@ export function MyScenesView({
   }, [scenes]);
 
   const filteredScenes = scenes.filter((scene) => {
+    const assetTypes = scene.asset_types ?? [];
     const isSingle = scene.primary_asset_type === "ply_mesh" || scene.scene_name.toLowerCase().includes("single-photo");
-    const isVideo = (scene.description?.toLowerCase().includes("video") || scene.asset_types.includes("ply")) && !scene.synthetic_demo && !isSingle;
+    const isVideo = (scene.description?.toLowerCase().includes("video") || assetTypes.includes("ply")) && !scene.synthetic_demo && !isSingle;
     const isPhotoSet = !isSingle && !isVideo;
 
     if (filterType === "single_photo" && !isSingle) return false;
@@ -104,12 +105,12 @@ export function MyScenesView({
         </div>
 
         <div className="my-scenes-actions">
-          <label className={`import-btn ${importingPackage ? "busy" : ""}`}>
+          <label className={`import-btn ${importingPackage ? "busy" : ""} ${isShowcaseMode() ? "disabled" : ""}`} title={isShowcaseMode() ? "Scene package import is disabled in Public Showcase mode" : "Import a .sfscene package"}>
             {importingPackage ? "Validating package…" : "+ Import .sfscene"}
             <input
               type="file"
               accept=".sfscene,application/zip"
-              disabled={importingPackage}
+              disabled={importingPackage || isShowcaseMode()}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
@@ -166,8 +167,9 @@ export function MyScenesView({
         <div className="scenes-cards-grid">
           {filteredScenes.map((scene) => {
             const val = validations[scene.scene_id];
+            const assetTypes = scene.asset_types ?? [];
             const isSingle = scene.primary_asset_type === "ply_mesh" || scene.scene_name.toLowerCase().includes("single-photo");
-            const isVideo = (scene.description?.toLowerCase().includes("video") || scene.asset_types.includes("ply")) && !scene.synthetic_demo && !isSingle;
+            const isVideo = (scene.description?.toLowerCase().includes("video") || assetTypes.includes("ply")) && !scene.synthetic_demo && !isSingle;
             const typeLabel = isSingle ? "Single-Photo AI" : isVideo ? "Video SfM" : scene.synthetic_demo ? "Demonstration" : "Multi-View";
             const isCurrent = scene.scene_id === selectedId;
 
@@ -226,22 +228,26 @@ export function MyScenesView({
                   <button
                     className="mgmt-btn"
                     onClick={() => handleStartRename(scene)}
-                    title="Rename this scene"
+                    disabled={isShowcaseMode()}
+                    title={isShowcaseMode() ? "Renaming is disabled in Public Showcase mode" : "Rename this scene"}
                   >
                     ✎ Rename
                   </button>
                   <a
-                    className="mgmt-btn export-link"
-                    href={exportSceneUrl(scene.scene_id)}
-                    download={`${scene.scene_id}.sfscene`}
-                    title="Download standalone .sfscene package"
+                    className={`mgmt-btn export-link ${isShowcaseMode() ? "disabled" : ""}`}
+                    href={isShowcaseMode() ? scene.manifest_url : exportSceneUrl(scene.scene_id)}
+                    download={isShowcaseMode() ? undefined : `${scene.scene_id}.sfscene`}
+                    title={isShowcaseMode() ? "View scene manifest JSON" : "Download standalone .sfscene package"}
+                    target={isShowcaseMode() ? "_blank" : undefined}
+                    rel={isShowcaseMode() ? "noreferrer" : undefined}
                   >
-                    ⤓ Export
+                    {isShowcaseMode() ? "↗ Manifest" : "⤓ Export"}
                   </a>
                   <button
                     className="mgmt-btn danger"
                     onClick={() => setDeletingScene(scene)}
-                    title="Delete this scene"
+                    disabled={isShowcaseMode()}
+                    title={isShowcaseMode() ? "Deleting is disabled in Public Showcase mode" : "Delete this scene"}
                   >
                     🗑 Delete
                   </button>

@@ -4,6 +4,7 @@ import {
   cancelCapture,
   clearFailedHistory,
   deleteSceneJob,
+  isShowcaseMode,
   listPipelineJobs,
   startReconstruction,
   uploadCapture,
@@ -251,6 +252,22 @@ export function ProcessingDashboard({
             {!embedded && <button onClick={onClose} aria-label="Close processing jobs" title="Close dialog">×</button>}
           </div>
         </header>
+
+        {isShowcaseMode() && (
+          <div className="showcase-workflow-notice" role="status" style={{ margin: "16px 20px" }}>
+            <div className="notice-icon">☁</div>
+            <div className="notice-copy">
+              <strong>Processing Studio Offline in Public Showcase</strong>
+              <p>
+                Live job queuing, frame extraction, and COLMAP bundle adjustment run locally on desktop workstations.
+                In this static web showcase, explore the completed reconstructions in the 3D Viewer.
+              </p>
+            </div>
+            <button type="button" className="notice-action-btn" onClick={() => (onSelectScene ? onSelectScene("scene_20261031T160047Z_cd37fab494") : onClose())}>
+              Open COLMAP Video Scene in Viewer →
+            </button>
+          </div>
+        )}
 
         {/* 1. DEDICATED PROCESSING STATUS CARD */}
         {displayJob && (
@@ -530,8 +547,16 @@ export function ProcessingDashboard({
                   ? "Video keyframes will be sampled and validated before reconstruction."
                   : "Overlap and camera coverage are checked during feature extraction."}
               </span>
-              <button disabled={uploading || files.length === 0} onClick={submit}>
-                {uploading ? (uploadProgress === null ? "Uploading…" : `Uploading ${uploadProgress}%`) : `Start ${modeCopy[mode].title.toLowerCase()} job`}
+              <button
+                disabled={uploading || files.length === 0 || isShowcaseMode()}
+                title={isShowcaseMode() ? "Capture processing runs locally on desktop workstations" : undefined}
+                onClick={submit}
+              >
+                {uploading
+                  ? (uploadProgress === null ? "Uploading…" : `Uploading ${uploadProgress}%`)
+                  : isShowcaseMode()
+                  ? "Offline in Public Showcase"
+                  : `Start ${modeCopy[mode].title.toLowerCase()} job`}
               </button>
             </footer>
           </div>

@@ -18,57 +18,73 @@ async function sendJson<T>(url: string, method: string, body: unknown, signal?: 
   return response.json() as Promise<T>;
 }
 
-let isStandaloneMode = false;
+export type AppRuntimeMode = "full" | "showcase";
+
+function detectInitialMode(): AppRuntimeMode {
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") {
+      const explicitMode = (import.meta.env.VITE_APP_MODE as string | undefined)?.toLowerCase();
+      return explicitMode === "showcase" ? "showcase" : "full";
+    }
+  }
+
+  const envMode = (import.meta.env.VITE_APP_MODE as string | undefined)?.toLowerCase();
+  if (envMode === "full") return "full";
+  return "showcase";
+}
+
+let activeMode: AppRuntimeMode = detectInitialMode();
+
+export function getAppMode(): AppRuntimeMode {
+  return activeMode;
+}
+
+export function isShowcaseMode(): boolean {
+  return activeMode === "showcase";
+}
+
+export function isFullMode(): boolean {
+  return activeMode === "full";
+}
+
+export function setAppMode(mode: AppRuntimeMode): void {
+  activeMode = mode;
+}
 
 export function isStandalone(): boolean {
-  return isStandaloneMode;
+  return isShowcaseMode();
 }
 
 export function setStandaloneMode(enabled: boolean): void {
-  isStandaloneMode = enabled;
+  activeMode = enabled ? "showcase" : "full";
+}
+
+function ensureFullModeAllowed(operation: string): void {
+  if (isShowcaseMode()) {
+    throw new Error(`${operation} is not available in Public Showcase mode. Run SpatialForge locally to process new captures.`);
+  }
 }
 
 export async function listScenes(signal?: AbortSignal): Promise<SceneSummary[]> {
-  const isPublicHost = typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
-  if (isPublicHost) {
-    try {
-      const showcase = await requestJson<{ scenes: SceneSummary[] }>("/showcase/scenes.json", signal);
-      isStandaloneMode = true;
-      return showcase.scenes;
-    } catch {
-      // Fall through to backend if showcase fails
-    }
+  if (isShowcaseMode()) {
+    const showcase = await requestJson<{ scenes: SceneSummary[] }>("/showcase/scenes.json", signal);
+    return showcase.scenes;
   }
-
-  try {
-    const result = await requestJson<{ scenes: SceneSummary[] }>("/api/v1/scenes", signal);
-    isStandaloneMode = false;
-    return result.scenes;
-  } catch (backendError) {
-    try {
-      const showcase = await requestJson<{ scenes: SceneSummary[] }>("/showcase/scenes.json", signal);
-      isStandaloneMode = true;
-      return showcase.scenes;
-    } catch {
-      throw backendError;
-    }
-  }
+  const result = await requestJson<{ scenes: SceneSummary[] }>("/api/v1/scenes", signal);
+  return result.scenes;
 }
 
 export async function loadManifest(sceneId: string, signal?: AbortSignal): Promise<SceneManifest> {
-  if (isStandaloneMode) {
+  if (isShowcaseMode()) {
     return requestJson(`/showcase/${encodeURIComponent(sceneId)}/metadata/scene_manifest.json`, signal);
   }
-  try {
-    return await requestJson(`/api/v1/scenes/${encodeURIComponent(sceneId)}/manifest`, signal);
-  } catch {
-    return requestJson(`/showcase/${encodeURIComponent(sceneId)}/metadata/scene_manifest.json`, signal);
-  }
+  return requestJson(`/api/v1/scenes/${encodeURIComponent(sceneId)}/manifest`, signal);
 }
 
 export function assetUrl(sceneId: string, path: string): string {
   const encodedPath = path.split("/").map(encodeURIComponent).join("/");
-  if (isStandaloneMode) {
+  if (isShowcaseMode()) {
     return `/showcase/${encodeURIComponent(sceneId)}/${encodedPath}`;
   }
   return `/api/v1/scenes/${encodeURIComponent(sceneId)}/assets/${encodedPath}`;
@@ -95,19 +111,13 @@ export function loadNavigationGrid(sceneId: string, manifest: SceneManifest, sig
 }
 
 export async function searchPois(sceneId: string, query = "", signal?: AbortSignal): Promise<POI[]> {
-  if (isStandaloneMode) {
+  if (isShowcaseMode()) {
     const raw = await requestJson<POI[] | { points?: POI[] }>(`/showcase/${encodeURIComponent(sceneId)}/metadata/pois.json`, signal).catch(() => []);
     const list = Array.isArray(raw) ? raw : raw.points ?? [];
     return query ? list.filter((p) => p.name.toLowerCase().includes(query.toLowerCase())) : list;
   }
-  try {
-    const result = await requestJson<{ points: POI[] }>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/pois?q=${encodeURIComponent(query)}`, signal);
-    return result.points;
-  } catch {
-    const raw = await requestJson<POI[] | { points?: POI[] }>(`/showcase/${encodeURIComponent(sceneId)}/metadata/pois.json`, signal).catch(() => []);
-    const list = Array.isArray(raw) ? raw : raw.points ?? [];
-    return query ? list.filter((p) => p.name.toLowerCase().includes(query.toLowerCase())) : list;
-  }
+  const result = await requestJson<{ points: POI[] }>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/pois?q=${encodeURIComponent(query)}`, signal);
+  return result.points;
 }
 
 export function createRoute(sceneId: string, start: Vector3Tuple, destinationPoiId: string, signal?: AbortSignal): Promise<RouteResult> {
@@ -119,29 +129,29 @@ export function createRoute(sceneId: string, start: Vector3Tuple, destinationPoi
 }
 
 export function createPoi(sceneId: string, poi: POI, signal?: AbortSignal): Promise<POI> {
+  ensureFullModeAllowed("Creating points of interest");
   return sendJson(`/api/v1/scenes/${encodeURIComponent(sceneId)}/pois`, "POST", poi, signal);
 }
 
 export async function listPipelineJobs(signal?: AbortSignal): Promise<PipelineJob[]> {
-  if (isStandaloneMode) return [];
-  try {
-    const result = await requestJson<{ jobs: PipelineJob[] }>("/api/v1/pipeline/jobs", signal);
-    return result.jobs;
-  } catch {
-    return [];
-  }
+  if (isShowcaseMode()) return [];
+  const result = await requestJson<{ jobs: PipelineJob[] }>("/api/v1/pipeline/jobs", signal);
+  return result.jobs;
 }
 
 export async function analyzePipelineCapture(sceneId: string, signal?: AbortSignal): Promise<PipelineJob> {
+  ensureFullModeAllowed("Capture analysis");
   const result = await sendJson<{ job: PipelineJob }>(`/api/v1/pipeline/jobs/${encodeURIComponent(sceneId)}/analyze-capture`, "POST", {}, signal);
   return result.job;
 }
 
 export async function startReconstruction(sceneId: string, signal?: AbortSignal): Promise<void> {
+  ensureFullModeAllowed("Starting 3D reconstruction");
   await sendJson(`/api/v1/scenes/${encodeURIComponent(sceneId)}/reconstruct`, "POST", {}, signal);
 }
 
 export async function cancelCapture(sceneId: string, signal?: AbortSignal): Promise<void> {
+  ensureFullModeAllowed("Cancelling capture");
   await sendJson(`/api/v1/captures/${encodeURIComponent(sceneId)}/cancel`, "POST", {}, signal);
 }
 
@@ -170,12 +180,14 @@ function uploadForm<T>(url: string, body: FormData, signal?: AbortSignal, onProg
 }
 
 export async function uploadCapture(file: File, signal?: AbortSignal, onProgress?: (percent: number | null) => void): Promise<{ scene_id: string; status: string }> {
+  ensureFullModeAllowed("Video capture upload");
   const body = new FormData();
   body.append("video", file, file.name);
   return uploadForm("/api/v1/captures", body, signal, onProgress);
 }
 
 export function uploadPhotoSet(files: File[], signal?: AbortSignal, onProgress?: (percent: number | null) => void, overrideNoncritical = false, profile = "auto"): Promise<{ scene_id: string; status: string }> {
+  ensureFullModeAllowed("Photo set upload");
   const body = new FormData();
   files.forEach((file) => body.append("photos", file, file.name));
   body.append("override_noncritical", String(overrideNoncritical));
@@ -184,6 +196,7 @@ export function uploadPhotoSet(files: File[], signal?: AbortSignal, onProgress?:
 }
 
 export function uploadSinglePhoto(file: File, signal?: AbortSignal, onProgress?: (percent: number | null) => void, depthExaggeration = 1, profile = "auto"): Promise<{ scene_id: string; status: string }> {
+  ensureFullModeAllowed("Single photo upload");
   const body = new FormData();
   body.append("image", file, file.name);
   body.append("depth_exaggeration", String(depthExaggeration));
@@ -192,6 +205,7 @@ export function uploadSinglePhoto(file: File, signal?: AbortSignal, onProgress?:
 }
 
 export async function importScenePackage(file: File, signal?: AbortSignal): Promise<SceneSummary> {
+  ensureFullModeAllowed("Scene package import");
   const body = new FormData();
   body.append("scene_package", file, file.name);
   const response = await fetch("/api/v1/scenes/import", { method: "POST", body, signal });
@@ -203,6 +217,7 @@ export async function importScenePackage(file: File, signal?: AbortSignal): Prom
 }
 
 export async function deleteSceneJob(sceneId: string, signal?: AbortSignal): Promise<void> {
+  ensureFullModeAllowed("Scene deletion");
   const response = await fetch(`/api/v1/scenes/${encodeURIComponent(sceneId)}`, { method: "DELETE", signal });
   if (!response.ok && response.status !== 404) {
     const payload = await response.json().catch(() => ({ detail: response.statusText }));
@@ -211,6 +226,7 @@ export async function deleteSceneJob(sceneId: string, signal?: AbortSignal): Pro
 }
 
 export async function clearFailedHistory(signal?: AbortSignal): Promise<{ deleted: string[]; count: number }> {
+  ensureFullModeAllowed("Clearing job history");
   const response = await fetch("/api/v1/pipeline/jobs/clear-history", { method: "POST", signal });
   if (!response.ok) {
     const payload = await response.json().catch(() => ({ detail: response.statusText }));
@@ -220,34 +236,30 @@ export async function clearFailedHistory(signal?: AbortSignal): Promise<{ delete
 }
 
 export async function validateViewerPack(sceneId: string, signal?: AbortSignal): Promise<ViewerPackValidation> {
-  const fallbackValidation: ViewerPackValidation = {
-    is_valid: true,
-    scene_id: sceneId,
-    scene_type: "showcase",
-    visual_asset_path: "reconstruction/colmap/exports/sparse.ply",
-    geometry_format: "ply",
-    point_count: 939,
-    triangle_count: 0,
-    bounding_box_min: [-21.8, -11.8, -5.5],
-    bounding_box_max: [35.2, 13.7, 49.2],
-    span: 57.0,
-    center: [6.7, 1.0, 21.8],
-    camera_pose_count: 19,
-    errors: [],
-    warnings: [],
-  };
-
-  if (isStandaloneMode) {
-    return fallbackValidation;
+  if (isShowcaseMode()) {
+    const isLoft = sceneId === "scene_synthetic_loft";
+    return {
+      is_valid: true,
+      scene_id: sceneId,
+      scene_type: isLoft ? "synthetic_twin" : "colmap_sfm",
+      visual_asset_path: isLoft ? "assets/demo-room.gltf" : "reconstruction/colmap/exports/sparse.ply",
+      geometry_format: isLoft ? "gltf" : "ply",
+      point_count: isLoft ? 640 : 939,
+      triangle_count: isLoft ? 120 : 0,
+      bounding_box_min: isLoft ? [-8.0, 0.0, -6.0] : [-21.8, -11.8, -5.5],
+      bounding_box_max: isLoft ? [8.0, 3.2, 6.0] : [35.2, 13.7, 49.2],
+      span: isLoft ? 16.0 : 57.0,
+      center: isLoft ? [0.0, 1.6, 0.0] : [6.7, 1.0, 21.8],
+      camera_pose_count: isLoft ? 4 : 19,
+      errors: [],
+      warnings: [],
+    };
   }
-  try {
-    return await requestJson<ViewerPackValidation>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/validate-viewer-pack`, signal);
-  } catch {
-    return fallbackValidation;
-  }
+  return requestJson<ViewerPackValidation>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/validate-viewer-pack`, signal);
 }
 
 export async function renameScene(sceneId: string, sceneName: string, signal?: AbortSignal): Promise<SceneSummary> {
+  ensureFullModeAllowed("Renaming scene");
   return sendJson<SceneSummary>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/rename`, "PATCH", { scene_name: sceneName }, signal);
 }
 
@@ -256,12 +268,8 @@ export function exportSceneUrl(sceneId: string): string {
 }
 
 export async function loadQualityReport(sceneId: string, signal?: AbortSignal): Promise<UnifiedQualityReport | null> {
-  if (isStandaloneMode) return null;
-  try {
-    return await requestJson<UnifiedQualityReport>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/quality-report`, signal);
-  } catch {
-    return null;
-  }
+  if (isShowcaseMode()) return null;
+  return requestJson<UnifiedQualityReport>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/quality-report`, signal);
 }
 
 export interface SystemDiagnostics {
@@ -303,7 +311,7 @@ export interface SystemDiagnostics {
 }
 
 export async function loadSystemDiagnostics(signal?: AbortSignal): Promise<SystemDiagnostics> {
-  if (isStandaloneMode) {
+  if (isShowcaseMode()) {
     return {
       platform: {
         system: "Cloud Web Client",
@@ -338,45 +346,10 @@ export async function loadSystemDiagnostics(signal?: AbortSignal): Promise<Syste
       },
     };
   }
-  try {
-    return await requestJson<SystemDiagnostics>("/api/v1/system/diagnostics", signal);
-  } catch {
-    return {
-      platform: {
-        system: "Cloud Web Client",
-        release: "Static Showcase",
-        machine: "WebGL 2.0",
-        processor: "Client Device",
-        execution_mode: "Standalone 3D Showcase (Serverless)",
-      },
-      memory: { total_mb: 8192, available_mb: 4096, load_percent: 50 },
-      models: {
-        depth_anything_v2: {
-          name: "Depth Anything V2 Small ONNX",
-          path: "Pre-computed 2.5D",
-          available: true,
-          size_mb: 94.5,
-          runtime: "CPUExecutionProvider (Exported)",
-        },
-      },
-      colmap: {
-        configured_path: "COLMAP 4.2.0 CPU",
-        available: true,
-        mode: "CPU Sparse Bundle Adjustment (Exported)",
-      },
-      storage: {
-        dataset_root: "showcase",
-        total_scenes: 2,
-        total_size_mb: 0.07,
-      },
-      concurrency: {
-        worker_count: 0,
-        reconstruction_workers: 0,
-      },
-    };
-  }
+  return requestJson<SystemDiagnostics>("/api/v1/system/diagnostics", signal);
 }
 
 export async function clearCompletedJobs(signal?: AbortSignal): Promise<{ cleared: string[]; count: number }> {
+  ensureFullModeAllowed("Clearing completed jobs");
   return sendJson<{ cleared: string[]; count: number }>("/api/v1/pipeline/jobs/clear-completed-jobs", "POST", {}, signal);
 }

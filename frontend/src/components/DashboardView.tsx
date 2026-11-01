@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { validateViewerPack } from "../api";
+import { isShowcaseMode, validateViewerPack } from "../api";
 import type { PipelineJob, SceneSummary, ViewerPackValidation } from "../types";
 
 export function DashboardView({
@@ -16,6 +16,7 @@ export function DashboardView({
   onNavigateTab: (tab: "dashboard" | "create" | "scenes" | "processing" | "settings" | "viewer") => void;
 }) {
   const [validations, setValidations] = useState<Record<string, ViewerPackValidation>>({});
+  const isShowcase = isShowcaseMode();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -50,15 +51,44 @@ export function DashboardView({
           >
             + Create New 3D Scene
           </button>
-          <div className="dashboard-system-pill">
-            <span className="status-ping" />
+          <div className={`dashboard-system-pill ${isShowcase ? "showcase-pill" : ""}`}>
+            <span className={`status-ping ${isShowcase ? "showcase-ping" : ""}`} />
             <div className="pill-text">
-              <strong>System Ready · CPU Execution</strong>
-              <small>Intel Integrated Graphics · 16 GB Headroom</small>
+              {isShowcase ? (
+                <>
+                  <strong>Public Showcase · Read-Only</strong>
+                  <small>Cloud WebGL Viewer · Static Geometry</small>
+                </>
+              ) : (
+                <>
+                  <strong>System Ready · CPU Execution</strong>
+                  <small>Intel Integrated Graphics · 16 GB Headroom</small>
+                </>
+              )}
             </div>
           </div>
         </div>
       </section>
+
+      {/* Showcase Information Banner */}
+      {isShowcase && (
+        <section className="dashboard-active-job-banner showcase-info-banner">
+          <div className="banner-visual">
+            <span className="banner-glyph">☁</span>
+          </div>
+          <div className="banner-info">
+            <span className="banner-tag">Public Web Showcase</span>
+            <strong>Pre-computed 3D Reconstructions Active</strong>
+            <small>
+              Live photogrammetry and video reconstruction require the local desktop engine with COLMAP 4.2+ and Depth Anything V2.
+              Judges can explore genuine reconstructed 3D point clouds and camera trajectories below.
+            </small>
+          </div>
+          <button className="banner-action-btn" onClick={() => onNavigateTab("viewer")}>
+            Open 3D Viewer 2.0 →
+          </button>
+        </section>
+      )}
 
       {/* Active Processing Alert Banner if running */}
       {activeJob && (
@@ -174,7 +204,8 @@ export function DashboardView({
           <div className="recent-scenes-grid">
             {recentScenes.map((scene) => {
               const val = validations[scene.scene_id];
-              const isVideo = (scene.description?.toLowerCase().includes("video") || scene.asset_types.includes("ply")) && !scene.synthetic_demo && scene.primary_asset_type !== "ply_mesh";
+              const assetTypes = scene.asset_types ?? [];
+              const isVideo = (scene.description?.toLowerCase().includes("video") || assetTypes.includes("ply")) && !scene.synthetic_demo && scene.primary_asset_type !== "ply_mesh";
               const isSingle = scene.primary_asset_type === "ply_mesh" || scene.scene_name.toLowerCase().includes("single-photo");
               const typeLabel = isSingle ? "Single-Photo AI" : isVideo ? "Video SfM" : scene.synthetic_demo ? "Demonstration" : "Multi-View";
 

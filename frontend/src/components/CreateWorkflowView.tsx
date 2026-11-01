@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type DragEvent } from "react";
 import {
   analyzePipelineCapture,
   clearFailedHistory,
+  isShowcaseMode,
   listPipelineJobs,
   startReconstruction,
   uploadCapture,
@@ -345,6 +346,22 @@ export function CreateWorkflowView({
           </button>
         </div>
       </header>
+
+      {isShowcaseMode() && (
+        <div className="showcase-workflow-notice" role="status">
+          <div className="notice-icon">☁</div>
+          <div className="notice-copy">
+            <strong>Public Showcase Mode (Read-Only)</strong>
+            <p>
+              Capture upload, frame analysis, and photogrammetry reconstruction run locally on desktop workstations
+              using Python, COLMAP 4.2+, and Depth Anything V2. This static cloud deployment cannot process new media.
+            </p>
+          </div>
+          <button type="button" className="notice-action-btn" onClick={() => onNavigateTab("viewer")}>
+            Explore Pre-computed Reconstructions in Viewer →
+          </button>
+        </div>
+      )}
 
       {notice && (
         <div className="workflow-alert-notice" role="status" style={{ marginBottom: "1rem" }}>
@@ -899,13 +916,18 @@ export function CreateWorkflowView({
                     <button
                       type="button"
                       className="start-reconstruction-btn"
-                      disabled={analyzing}
+                      disabled={analyzing || isShowcaseMode()}
+                      title={isShowcaseMode() ? "Capture processing requires the local SpatialForge backend. Run the app on your workstation to reconstruct." : undefined}
                       onClick={handleExtractAndAnalyze}
                     >
                       {analyzing ? (
                         <>
                           <span className="spinner-orbit" />
                           <span>Extracting & Analyzing Frames ({uploadProgress ?? 0}%)…</span>
+                        </>
+                      ) : isShowcaseMode() ? (
+                        <>
+                          <span>☁ Processing Offline in Showcase</span>
                         </>
                       ) : (
                         <>
@@ -917,13 +939,18 @@ export function CreateWorkflowView({
                     <button
                       type="button"
                       className="start-reconstruction-btn"
-                      disabled={uploading || reconstructing}
+                      disabled={uploading || reconstructing || isShowcaseMode()}
+                      title={isShowcaseMode() ? "Reconstruction requires the local SpatialForge backend with COLMAP and Depth Anything V2." : undefined}
                       onClick={handleStartReconstruction}
                     >
                       {uploading || reconstructing ? (
                         <>
                           <span className="spinner-orbit" />
                           <span>{uploading ? `Uploading (${uploadProgress ?? 0}%)…` : "Starting COLMAP SfM…"}</span>
+                        </>
+                      ) : isShowcaseMode() ? (
+                        <>
+                          <span>☁ Reconstruction Offline in Showcase</span>
                         </>
                       ) : (
                         <>

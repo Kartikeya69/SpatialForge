@@ -13,7 +13,7 @@ export function SceneLibrary({ scenes, selectedId, onSelect }: {
   const active = scenes.find((scene) => scene.scene_id === selectedId) ?? scenes[0];
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return scenes.filter((scene) => !needle || `${scene.scene_name} ${scene.description} ${scene.asset_types.join(" ")}`.toLowerCase().includes(needle));
+    return scenes.filter((scene) => !needle || `${scene.scene_name} ${scene.description} ${(scene.asset_types ?? []).join(" ")}`.toLowerCase().includes(needle));
   }, [query, scenes]);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export function SceneLibrary({ scenes, selectedId, onSelect }: {
                   <span className="scene-card-copy">
                     <strong>{scene.scene_name}</strong>
                     <small>{scene.description || "No description available"}</small>
-                    <span className="asset-tags">{scene.asset_types.slice(0, 4).map((type) => <em key={type}>{type.toUpperCase()}</em>)}</span>
+                    <span className="asset-tags">{(scene.asset_types ?? []).slice(0, 4).map((type) => <em key={type}>{type.toUpperCase()}</em>)}</span>
                   </span>
                   {scene.scene_id === selectedId && <span className="active-check" aria-label="Currently active">✓</span>}
                 </button>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { clearCompletedJobs, clearFailedHistory, loadSystemDiagnostics, type SystemDiagnostics } from "../api";
+import { clearCompletedJobs, clearFailedHistory, isShowcaseMode, loadSystemDiagnostics, type SystemDiagnostics } from "../api";
 
 export function SettingsView({ onRefreshScenes }: { onRefreshScenes?: () => void }) {
   const [diagnostics, setDiagnostics] = useState<SystemDiagnostics | null>(null);
@@ -255,20 +255,25 @@ export function SettingsView({ onRefreshScenes }: { onRefreshScenes?: () => void
               <button
                 className="action-btn warning-btn"
                 onClick={handleClearFailed}
-                disabled={clearingFailed}
-                title="Remove failed or incomplete temporary reconstruction artifacts"
+                disabled={clearingFailed || isShowcaseMode()}
+                title={isShowcaseMode() ? "Disk management is disabled in Public Showcase mode" : "Remove failed or incomplete temporary reconstruction artifacts"}
               >
                 {clearingFailed ? "Clearing…" : "Clear Failed Job Artifacts"}
               </button>
               <button
                 className="action-btn secondary-btn"
                 onClick={handleClearCompleted}
-                disabled={clearingCompleted}
-                title="Clear completed job records from the processing dashboard"
+                disabled={clearingCompleted || isShowcaseMode()}
+                title={isShowcaseMode() ? "Disk management is disabled in Public Showcase mode" : "Clear completed job records from the processing dashboard"}
               >
                 {clearingCompleted ? "Clearing…" : "Clear Completed Job Records"}
               </button>
             </div>
+            {isShowcaseMode() && (
+              <small style={{ display: "block", marginTop: "8px", color: "var(--muted)" }}>
+                Note: Disk storage management is read-only in Public Showcase mode.
+              </small>
+            )}
           </div>
         </section>
       </div>

@@ -6,7 +6,12 @@
       "description": "Real video reconstruction with 19 registered cameras, sub-pixel reprojection error (0.714 px), and sparse 3D point cloud.",
       "processing_status": "completed",
       "synthetic_demo": false,
+      "asset_types": ["ply"],
+      "primary_asset_type": "ply",
+      "backend": "colmap",
       "metric_scale_status": "arbitrary",
+      "created_at": "2026-10-31T16:01:23.860311+00:00",
+      "manifest_url": "/showcase/scene_20261031T160047Z_cd37fab494/metadata/scene_manifest.json",
       "reconstruction": {
         "backend": "colmap",
         "status": "completed"
@@ -18,7 +23,12 @@
       "description": "Interactive indoor architectural digital twin demonstrating collision physics, minimap, route planning, and first-person walk mode.",
       "processing_status": "completed",
       "synthetic_demo": true,
+      "asset_types": ["gltf", "ply"],
+      "primary_asset_type": "gltf",
+      "backend": "synthetic_generator",
       "metric_scale_status": "known",
+      "created_at": "2026-10-28T12:00:00.000000+00:00",
+      "manifest_url": "/showcase/scene_synthetic_loft/metadata/scene_manifest.json",
       "navigation": {
         "enabled": true
       },

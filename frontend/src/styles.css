@@ -2508,3 +2508,69 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   .capture-previews { grid-template-columns: 1fr; }
   .details-panel { inset: 12px; }
 }
+
+.runtime-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 600 10px var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.runtime-mode-badge.local {
+  background: rgba(0, 210, 180, 0.12);
+  border: 1px solid rgba(0, 210, 180, 0.35);
+  color: var(--mint);
+}
+.runtime-mode-badge.showcase {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+.showcase-workflow-notice {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 8px;
+  color: #e2e8f0;
+}
+.showcase-workflow-notice .notice-icon {
+  font-size: 24px;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+.showcase-workflow-notice .notice-copy strong {
+  display: block;
+  font-size: 14px;
+  color: #f8fafc;
+  margin-bottom: 2px;
+}
+.showcase-workflow-notice .notice-copy p {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+.showcase-workflow-notice .notice-action-btn {
+  margin-left: auto;
+  white-space: nowrap;
+  padding: 8px 16px;
+  background: #0284c7;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.showcase-workflow-notice .notice-action-btn:hover {
+  background: #0369a1;
+}

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPoi, createRoute, importScenePackage, listPipelineJobs, listScenes, loadColliders, loadManifest, loadNavigationGrid, searchPois } from "./api";
+import { createPoi, createRoute, importScenePackage, isShowcaseMode, listPipelineJobs, listScenes, loadColliders, loadManifest, loadNavigationGrid, searchPois } from "./api";
 import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
 import { ViewerErrorBoundary, supportsWebGL } from "./components/ErrorBoundary";
 import { HelpDialog } from "./components/HelpDialog";
@@ -239,6 +239,9 @@ export default function App() {
               <strong>SpatialForge</strong>
               <span>3D Reconstruction Studio</span>
             </div>
+            <span className={`runtime-mode-badge ${isShowcaseMode() ? "showcase" : "local"}`}>
+              {isShowcaseMode() ? "Public Showcase" : "Local Engine"}
+            </span>
           </div>
 
           <nav className="main-nav-tabs" aria-label="Main Navigation">
