@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "synthetic_demo": true,
+  "pose_convention": "camera_to_world",
+  "positions": [
+    [
+      -4,
+      1.65,
+      -3.5
+    ],
+    [
+      -3,
+      1.65,
+      -1
+    ],
+    [
+      -1,
+      1.65,
+      1
+    ],
+    [
+      2,
+      1.65,
+      1
+    ],
+    [
+      4,
+      1.65,
+      3
+    ]
+  ]
+}

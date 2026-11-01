@@ -1,0 +1,31 @@
+{
+  "scenes": [
+    {
+      "scene_id": "scene_20261031T160047Z_cd37fab494",
+      "scene_name": "COLMAP Video Reconstruction (CPU SfM)",
+      "description": "Real video reconstruction with 19 registered cameras, sub-pixel reprojection error (0.714 px), and sparse 3D point cloud.",
+      "processing_status": "completed",
+      "synthetic_demo": false,
+      "metric_scale_status": "arbitrary",
+      "reconstruction": {
+        "backend": "colmap",
+        "status": "completed"
+      }
+    },
+    {
+      "scene_id": "scene_synthetic_loft",
+      "scene_name": "Synthetic Twin Lab (Indoor Roaming)",
+      "description": "Interactive indoor architectural digital twin demonstrating collision physics, minimap, route planning, and first-person walk mode.",
+      "processing_status": "completed",
+      "synthetic_demo": true,
+      "metric_scale_status": "known",
+      "navigation": {
+        "enabled": true
+      },
+      "reconstruction": {
+        "backend": "synthetic_generator",
+        "status": "demonstration"
+      }
+    }
+  ]
+}

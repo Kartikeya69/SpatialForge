@@ -1,0 +1,149 @@
+{
+  "schema_version": "1.0.0",
+  "points": [
+    {
+      "id": "poi_reception",
+      "name": "Reception",
+      "category": "service",
+      "description": "Visitor check-in near the main entrance.",
+      "aliases": [
+        "front desk",
+        "check in"
+      ],
+      "position": [
+        -3.9,
+        0.04,
+        -3.5
+      ],
+      "arrival_points": [
+        [
+          -3.9,
+          0.04,
+          -3.5
+        ]
+      ],
+      "floor_id": "ground",
+      "zone": "entry"
+    },
+    {
+      "id": "poi_meeting_a",
+      "name": "Meeting Room A",
+      "category": "room",
+      "description": "Primary collaboration room.",
+      "aliases": [
+        "conference room",
+        "meeting"
+      ],
+      "position": [
+        3.6,
+        0.04,
+        3.9
+      ],
+      "arrival_points": [
+        [
+          1.2,
+          0.04,
+          1.1
+        ]
+      ],
+      "floor_id": "ground",
+      "zone": "meeting"
+    },
+    {
+      "id": "poi_restroom",
+      "name": "Restroom",
+      "category": "facility",
+      "description": "Ground-floor accessible restroom.",
+      "aliases": [
+        "washroom",
+        "toilet"
+      ],
+      "position": [
+        4.2,
+        0.04,
+        -3.2
+      ],
+      "arrival_points": [
+        [
+          3.7,
+          0.04,
+          -3.2
+        ]
+      ],
+      "floor_id": "ground",
+      "zone": "facilities"
+    },
+    {
+      "id": "poi_studio_table",
+      "name": "Studio Table",
+      "category": "furniture",
+      "description": "Prototype work table.",
+      "aliases": [
+        "workbench",
+        "desk"
+      ],
+      "position": [
+        -3.1,
+        0.9,
+        0.8
+      ],
+      "arrival_points": [
+        [
+          -1.6,
+          0.04,
+          0.8
+        ]
+      ],
+      "floor_id": "ground",
+      "zone": "studio"
+    },
+    {
+      "id": "poi_lounge_sofa",
+      "name": "Lounge Sofa",
+      "category": "furniture",
+      "description": "Collaboration lounge seating.",
+      "aliases": [
+        "couch",
+        "seating"
+      ],
+      "position": [
+        3.3,
+        1.0,
+        2.9
+      ],
+      "arrival_points": [
+        [
+          1.5,
+          0.04,
+          2.9
+        ]
+      ],
+      "floor_id": "ground",
+      "zone": "lounge"
+    },
+    {
+      "id": "poi_exit",
+      "name": "Main Exit",
+      "category": "entrance",
+      "description": "Main building entrance and exit.",
+      "aliases": [
+        "door",
+        "entrance"
+      ],
+      "position": [
+        0,
+        1.2,
+        -4.65
+      ],
+      "arrival_points": [
+        [
+          0,
+          0.04,
+          -4.4
+        ]
+      ],
+      "floor_id": "ground",
+      "zone": "entry"
+    }
+  ]
+}

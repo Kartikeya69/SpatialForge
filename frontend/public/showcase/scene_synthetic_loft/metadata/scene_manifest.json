@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0.0",
+  "scene_id": "scene_synthetic_loft",
+  "scene_name": "Synthetic Twin Lab",
+  "description": "Deterministic multi-zone indoor navigation demo with explicit walkability data. Not a reconstruction.",
+  "synthetic_demo": true,
+  "processing_status": "demonstration",
+  "coordinate_system": {
+    "handedness": "right",
+    "up_axis": "Y",
+    "forward_axis": "-Z",
+    "source_convention": "SpatialForge synthetic Y-up",
+    "source_to_scene_matrix_row_major": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+    ]
+  },
+  "units": {
+    "name": "meter",
+    "metric_scale_status": "known",
+    "meters_per_unit": 1
+  },
+  "origin": [
+    0,
+    0,
+    0
+  ],
+  "bounding_box": {
+    "minimum": [
+      -6,
+      -0.1,
+      -5
+    ],
+    "maximum": [
+      6,
+      3,
+      5
+    ]
+  },
+  "reconstruction": {
+    "backend": "synthetic_generator",
+    "backend_version": "1.0.0",
+    "source": "synthetic",
+    "status": "demonstration",
+    "metric_scale_calibrated": true
+  },
+  "assets": [
+    {
+      "id": "demo_model",
+      "type": "gltf",
+      "path": "assets/demo-room.gltf",
+      "role": "primary_visual",
+      "mime_type": "model/gltf+json"
+    },
+    {
+      "id": "diagnostic_points",
+      "type": "ply",
+      "path": "assets/diagnostic-points.ply",
+      "role": "diagnostic",
+      "mime_type": "application/octet-stream",
+      "visible_by_default": false
+    },
+    {
+      "id": "colliders",
+      "type": "collider_geometry",
+      "path": "navigation/colliders.json",
+      "role": "navigation",
+      "mime_type": "application/json",
+      "visible_by_default": false
+    },
+    {
+      "id": "navigation_grid",
+      "type": "navigation_grid",
+      "path": "navigation/grid.json",
+      "role": "navigation",
+      "mime_type": "application/json",
+      "visible_by_default": false
+    },
+    {
+      "id": "camera_poses",
+      "type": "camera_poses",
+      "path": "metadata/camera_poses.json",
+      "role": "diagnostic",
+      "mime_type": "application/json",
+      "visible_by_default": false
+    },
+    {
+      "id": "pois",
+      "type": "poi_metadata",
+      "path": "metadata/pois.json",
+      "role": "metadata",
+      "mime_type": "application/json",
+      "visible_by_default": false
+    }
+  ],
+  "camera_metadata": {
+    "pose_asset_id": "camera_poses",
+    "pose_convention": "camera_to_world"
+  },
+  "navigation": {
+    "enabled": true,
+    "spawn_position": [
+      -4.5,
+      1.65,
+      -3.7
+    ],
+    "spawn_yaw_degrees": -130,
+    "camera_height": 1.65,
+    "movement_speed": 2.5,
+    "collision_radius": 0.28,
+    "collider_asset_id": "colliders",
+    "grid_asset_id": "navigation_grid",
+    "zones": [
+      "entry",
+      "studio",
+      "lounge",
+      "meeting",
+      "facilities"
+    ]
+  },
+  "poi_metadata": {
+    "asset_id": "pois",
+    "count": 6
+  },
+  "viewer": {
+    "background": "#06131d",
+    "ambient_light_intensity": 0.85,
+    "directional_light_intensity": 2.1,
+    "point_size": 0.045
+  }
+}

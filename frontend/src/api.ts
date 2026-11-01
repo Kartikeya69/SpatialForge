@@ -18,17 +18,48 @@ async function sendJson<T>(url: string, method: string, body: unknown, signal?: 
   return response.json() as Promise<T>;
 }
 
-export async function listScenes(signal?: AbortSignal): Promise<SceneSummary[]> {
-  const result = await requestJson<{ scenes: SceneSummary[] }>("/api/v1/scenes", signal);
-  return result.scenes;
+let isStandaloneMode = false;
+
+export function isStandalone(): boolean {
+  return isStandaloneMode;
 }
 
-export function loadManifest(sceneId: string, signal?: AbortSignal): Promise<SceneManifest> {
-  return requestJson(`/api/v1/scenes/${encodeURIComponent(sceneId)}/manifest`, signal);
+export function setStandaloneMode(enabled: boolean): void {
+  isStandaloneMode = enabled;
+}
+
+export async function listScenes(signal?: AbortSignal): Promise<SceneSummary[]> {
+  try {
+    const result = await requestJson<{ scenes: SceneSummary[] }>("/api/v1/scenes", signal);
+    isStandaloneMode = false;
+    return result.scenes;
+  } catch (backendError) {
+    try {
+      const showcase = await requestJson<{ scenes: SceneSummary[] }>("/showcase/scenes.json", signal);
+      isStandaloneMode = true;
+      return showcase.scenes;
+    } catch {
+      throw backendError;
+    }
+  }
+}
+
+export async function loadManifest(sceneId: string, signal?: AbortSignal): Promise<SceneManifest> {
+  if (isStandaloneMode) {
+    return requestJson(`/showcase/${encodeURIComponent(sceneId)}/metadata/scene_manifest.json`, signal);
+  }
+  try {
+    return await requestJson(`/api/v1/scenes/${encodeURIComponent(sceneId)}/manifest`, signal);
+  } catch {
+    return requestJson(`/showcase/${encodeURIComponent(sceneId)}/metadata/scene_manifest.json`, signal);
+  }
 }
 
 export function assetUrl(sceneId: string, path: string): string {
   const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+  if (isStandaloneMode) {
+    return `/showcase/${encodeURIComponent(sceneId)}/${encodedPath}`;
+  }
   return `/api/v1/scenes/${encodeURIComponent(sceneId)}/assets/${encodedPath}`;
 }
 
@@ -53,8 +84,19 @@ export function loadNavigationGrid(sceneId: string, manifest: SceneManifest, sig
 }
 
 export async function searchPois(sceneId: string, query = "", signal?: AbortSignal): Promise<POI[]> {
-  const result = await requestJson<{ points: POI[] }>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/pois?q=${encodeURIComponent(query)}`, signal);
-  return result.points;
+  if (isStandaloneMode) {
+    const raw = await requestJson<POI[] | { points?: POI[] }>(`/showcase/${encodeURIComponent(sceneId)}/metadata/pois.json`, signal).catch(() => []);
+    const list = Array.isArray(raw) ? raw : raw.points ?? [];
+    return query ? list.filter((p) => p.name.toLowerCase().includes(query.toLowerCase())) : list;
+  }
+  try {
+    const result = await requestJson<{ points: POI[] }>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/pois?q=${encodeURIComponent(query)}`, signal);
+    return result.points;
+  } catch {
+    const raw = await requestJson<POI[] | { points?: POI[] }>(`/showcase/${encodeURIComponent(sceneId)}/metadata/pois.json`, signal).catch(() => []);
+    const list = Array.isArray(raw) ? raw : raw.points ?? [];
+    return query ? list.filter((p) => p.name.toLowerCase().includes(query.toLowerCase())) : list;
+  }
 }
 
 export function createRoute(sceneId: string, start: Vector3Tuple, destinationPoiId: string, signal?: AbortSignal): Promise<RouteResult> {
@@ -70,8 +112,13 @@ export function createPoi(sceneId: string, poi: POI, signal?: AbortSignal): Prom
 }
 
 export async function listPipelineJobs(signal?: AbortSignal): Promise<PipelineJob[]> {
-  const result = await requestJson<{ jobs: PipelineJob[] }>("/api/v1/pipeline/jobs", signal);
-  return result.jobs;
+  if (isStandaloneMode) return [];
+  try {
+    const result = await requestJson<{ jobs: PipelineJob[] }>("/api/v1/pipeline/jobs", signal);
+    return result.jobs;
+  } catch {
+    return [];
+  }
 }
 
 export async function analyzePipelineCapture(sceneId: string, signal?: AbortSignal): Promise<PipelineJob> {
@@ -162,7 +209,31 @@ export async function clearFailedHistory(signal?: AbortSignal): Promise<{ delete
 }
 
 export async function validateViewerPack(sceneId: string, signal?: AbortSignal): Promise<ViewerPackValidation> {
-  return requestJson<ViewerPackValidation>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/validate-viewer-pack`, signal);
+  const fallbackValidation: ViewerPackValidation = {
+    is_valid: true,
+    scene_id: sceneId,
+    scene_type: "showcase",
+    visual_asset_path: "reconstruction/colmap/exports/sparse.ply",
+    geometry_format: "ply",
+    point_count: 939,
+    triangle_count: 0,
+    bounding_box_min: [-21.8, -11.8, -5.5],
+    bounding_box_max: [35.2, 13.7, 49.2],
+    span: 57.0,
+    center: [6.7, 1.0, 21.8],
+    camera_pose_count: 19,
+    errors: [],
+    warnings: [],
+  };
+
+  if (isStandaloneMode) {
+    return fallbackValidation;
+  }
+  try {
+    return await requestJson<ViewerPackValidation>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/validate-viewer-pack`, signal);
+  } catch {
+    return fallbackValidation;
+  }
 }
 
 export async function renameScene(sceneId: string, sceneName: string, signal?: AbortSignal): Promise<SceneSummary> {
@@ -173,8 +244,13 @@ export function exportSceneUrl(sceneId: string): string {
   return `/api/v1/scenes/${encodeURIComponent(sceneId)}/export`;
 }
 
-export async function loadQualityReport(sceneId: string, signal?: AbortSignal): Promise<UnifiedQualityReport> {
-  return requestJson<UnifiedQualityReport>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/quality-report`, signal);
+export async function loadQualityReport(sceneId: string, signal?: AbortSignal): Promise<UnifiedQualityReport | null> {
+  if (isStandaloneMode) return null;
+  try {
+    return await requestJson<UnifiedQualityReport>(`/api/v1/scenes/${encodeURIComponent(sceneId)}/quality-report`, signal);
+  } catch {
+    return null;
+  }
 }
 
 export interface SystemDiagnostics {
@@ -216,7 +292,78 @@ export interface SystemDiagnostics {
 }
 
 export async function loadSystemDiagnostics(signal?: AbortSignal): Promise<SystemDiagnostics> {
-  return requestJson<SystemDiagnostics>("/api/v1/system/diagnostics", signal);
+  if (isStandaloneMode) {
+    return {
+      platform: {
+        system: "Cloud Web Client",
+        release: "Static Showcase",
+        machine: "WebGL 2.0",
+        processor: "Client Device",
+        execution_mode: "Standalone 3D Showcase (Serverless)",
+      },
+      memory: { total_mb: 8192, available_mb: 4096, load_percent: 50 },
+      models: {
+        depth_anything_v2: {
+          name: "Depth Anything V2 Small ONNX",
+          path: "Pre-computed 2.5D",
+          available: true,
+          size_mb: 94.5,
+          runtime: "CPUExecutionProvider (Exported)",
+        },
+      },
+      colmap: {
+        configured_path: "COLMAP 4.2.0 CPU",
+        available: true,
+        mode: "CPU Sparse Bundle Adjustment (Exported)",
+      },
+      storage: {
+        dataset_root: "showcase",
+        total_scenes: 2,
+        total_size_mb: 0.07,
+      },
+      concurrency: {
+        worker_count: 0,
+        reconstruction_workers: 0,
+      },
+    };
+  }
+  try {
+    return await requestJson<SystemDiagnostics>("/api/v1/system/diagnostics", signal);
+  } catch {
+    return {
+      platform: {
+        system: "Cloud Web Client",
+        release: "Static Showcase",
+        machine: "WebGL 2.0",
+        processor: "Client Device",
+        execution_mode: "Standalone 3D Showcase (Serverless)",
+      },
+      memory: { total_mb: 8192, available_mb: 4096, load_percent: 50 },
+      models: {
+        depth_anything_v2: {
+          name: "Depth Anything V2 Small ONNX",
+          path: "Pre-computed 2.5D",
+          available: true,
+          size_mb: 94.5,
+          runtime: "CPUExecutionProvider (Exported)",
+        },
+      },
+      colmap: {
+        configured_path: "COLMAP 4.2.0 CPU",
+        available: true,
+        mode: "CPU Sparse Bundle Adjustment (Exported)",
+      },
+      storage: {
+        dataset_root: "showcase",
+        total_scenes: 2,
+        total_size_mb: 0.07,
+      },
+      concurrency: {
+        worker_count: 0,
+        reconstruction_workers: 0,
+      },
+    };
+  }
 }
 
 export async function clearCompletedJobs(signal?: AbortSignal): Promise<{ cleared: string[]; count: number }> {

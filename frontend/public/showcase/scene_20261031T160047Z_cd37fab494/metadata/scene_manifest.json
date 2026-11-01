@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0.0",
+  "scene_id": "scene_20261031T160047Z_cd37fab494",
+  "scene_name": "20261031T160047Z Cd37Fab494",
+  "description": "Real reconstruction packaged by SpatialForge. Navigation remains disabled until reviewed geometry is supplied.",
+  "synthetic_demo": false,
+  "processing_status": "completed",
+  "coordinate_system": {
+    "handedness": "right",
+    "up_axis": "Y",
+    "forward_axis": "-Z",
+    "source_convention": "COLMAP reconstruction coordinates",
+    "source_to_scene_matrix_row_major": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "units": {
+    "name": "scene_unit",
+    "metric_scale_status": "arbitrary",
+    "meters_per_unit": null
+  },
+  "origin": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "bounding_box": {
+    "minimum": [
+      -21.79692840576172,
+      -11.76272964477539,
+      -5.497664451599121
+    ],
+    "maximum": [
+      35.168739318847656,
+      13.707369804382324,
+      49.20069122314453
+    ]
+  },
+  "reconstruction": {
+    "backend": "colmap",
+    "backend_version": "COLMAP 4.2.0 (Commit be5e291 on 2026-08-31 without GPU support)",
+    "source": "reconstruction",
+    "status": "completed",
+    "metric_scale_calibrated": false
+  },
+  "assets": [
+    {
+      "id": "reconstructed_visual",
+      "type": "ply",
+      "path": "reconstruction/colmap/exports/sparse.ply",
+      "role": "primary_visual",
+      "mime_type": "application/octet-stream",
+      "required": true,
+      "visible_by_default": true
+    },
+    {
+      "id": "camera_poses",
+      "type": "camera_poses",
+      "path": "reconstruction/colmap/exports/camera_poses.json",
+      "role": "diagnostic",
+      "mime_type": "application/json",
+      "required": true,
+      "visible_by_default": false
+    }
+  ],
+  "camera_metadata": {
+    "pose_asset_id": "camera_poses",
+    "pose_convention": "camera_to_world"
+  },
+  "navigation": {
+    "enabled": false,
+    "spawn_position": [
+      1.859987290846975,
+      0.17300376535944442,
+      -0.7000812979262303
+    ],
+    "spawn_yaw_degrees": 167.9,
+    "camera_height": 1.65,
+    "movement_speed": 2.5,
+    "collision_radius": 0.25,
+    "collider_asset_id": null,
+    "grid_asset_id": null,
+    "zones": []
+  },
+  "poi_metadata": {
+    "asset_id": null,
+    "count": 0
+  },
+  "viewer": {
+    "background": "#06131d",
+    "ambient_light_intensity": 0.85,
+    "directional_light_intensity": 2.1,
+    "point_size": 0.3165
+  }
+}
