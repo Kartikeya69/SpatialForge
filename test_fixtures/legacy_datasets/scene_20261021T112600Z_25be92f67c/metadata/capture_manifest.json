@@ -1,0 +1,74 @@
+{
+  "scene_id": "scene_20261021T112600Z_25be92f67c",
+  "original_input_filename": "room.mp4",
+  "video_metadata": {
+    "fps": 10.0,
+    "width": 320,
+    "height": 240,
+    "frame_count": 20,
+    "duration_seconds": 2.0
+  },
+  "extraction_config": {
+    "sample_fps": 2.0,
+    "blur_threshold": 80.0,
+    "min_width": 640,
+    "min_height": 480,
+    "max_width": 200,
+    "duplicate_threshold": 0.995,
+    "enable_blur_filter": false,
+    "enable_duplicate_filter": false,
+    "jpeg_quality": 92,
+    "dataset_root": "datasets",
+    "upload_size_limit_mb": 1024,
+    "worker_count": 2
+  },
+  "total_frames_sampled": 4,
+  "accepted_frames": 0,
+  "rejected_frames": 4,
+  "rejection_reasons": {
+    "below_minimum_resolution": 4
+  },
+  "images": [],
+  "rejections": [
+    {
+      "source_frame_index": 0,
+      "timestamp_seconds": 0.0,
+      "reasons": [
+        "below_minimum_resolution"
+      ],
+      "blur_score": 3865.308,
+      "duplicate_similarity": null
+    },
+    {
+      "source_frame_index": 5,
+      "timestamp_seconds": 0.5,
+      "reasons": [
+        "below_minimum_resolution"
+      ],
+      "blur_score": 6235.599,
+      "duplicate_similarity": null
+    },
+    {
+      "source_frame_index": 10,
+      "timestamp_seconds": 1.0,
+      "reasons": [
+        "below_minimum_resolution"
+      ],
+      "blur_score": 9032.749,
+      "duplicate_similarity": null
+    },
+    {
+      "source_frame_index": 15,
+      "timestamp_seconds": 1.5,
+      "reasons": [
+        "below_minimum_resolution"
+      ],
+      "blur_score": 7826.213,
+      "duplicate_similarity": null
+    }
+  ],
+  "processing_duration_seconds": 0.04188,
+  "pipeline_version": "0.1.0",
+  "processing_status": "failed",
+  "error": "No frames passed quality filtering. Lower thresholds or inspect capture quality."
+}

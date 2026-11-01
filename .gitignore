@@ -1,0 +1,51 @@
+# Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python caches and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local environment configuration & secrets
+.env
+.env.local
+*.local.yaml
+
+# Runtime datasets (User media and scene reconstructions)
+datasets/*
+!datasets/.gitkeep
+
+# Model weights (Download per README instructions)
+models/*
+!models/.gitkeep
+
+# Runtime logs
+logs/*
+!logs/.gitkeep
+
+# Frontend build outputs and dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/.vite/
+
+# Temporary and scratch files
+scratch/
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

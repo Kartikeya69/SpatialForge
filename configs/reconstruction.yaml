@@ -1,0 +1,16 @@
+backend: colmap
+colmap_path: null
+profile: cpu_sparse
+matcher: auto
+vocab_tree_path: models/vocab_tree_flickr100K_words32K.bin
+max_exhaustive_images: 80
+camera_model: SIMPLE_RADIAL
+single_camera: true
+max_num_features: 8192
+max_image_size: 2000
+num_threads: 4
+init_min_tri_angle: 8.0
+abs_pose_min_num_inliers: 20
+sequential_overlap: 10
+timeout_seconds: 3600
+minimum_images: 3

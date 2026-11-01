@@ -1,0 +1,12 @@
+sample_fps: 2.0
+blur_threshold: 80.0
+min_width: 640
+min_height: 480
+max_width: 1920
+duplicate_threshold: 0.995
+enable_blur_filter: true
+enable_duplicate_filter: true
+jpeg_quality: 92
+dataset_root: datasets
+upload_size_limit_mb: 1024
+worker_count: 2

@@ -1,0 +1,26 @@
+{
+  "scene_id": "scene_20261021T112616Z_f814edaf69",
+  "backend": "colmap",
+  "backend_version": null,
+  "configuration": {
+    "backend": "colmap",
+    "colmap_path": null,
+    "matcher": "sequential",
+    "camera_model": "SIMPLE_RADIAL",
+    "single_camera": true,
+    "max_num_features": 8192,
+    "sequential_overlap": 10,
+    "timeout_seconds": 30,
+    "minimum_images": 3
+  },
+  "processing_status": "failed",
+  "current_stage": "environment",
+  "failed_stage": "environment",
+  "artifacts": {},
+  "metrics": {},
+  "warnings": [
+    "The dataset meets the minimum image count, but substantially more overlapping images are normally needed for a robust indoor reconstruction."
+  ],
+  "processing_duration_seconds": 0.013459,
+  "error": "COLMAP was not found on PATH. Install the Windows binary and pass --colmap-path if it is not on PATH."
+}

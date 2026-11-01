@@ -1,0 +1,11 @@
+# SpatialForge — Competition Abstract
+
+Indoor environments remain difficult to digitize and navigate without specialized scanners, proprietary platforms or manually authored floor plans. SpatialForge is an open, modular pipeline that converts ordinary smartphone capture into portable indoor scene packages for browser-based exploration and spatial intelligence.
+
+The system separates acquisition, reconstruction, spatial calibration, visualization and navigation. Its capture engine streams MP4/MOV video, samples ordered frames and rejects unsuitable imagery using configurable sharpness, resolution and conservative duplicate checks. A COLMAP adapter performs feature extraction, matching, sparse mapping, camera-pose export and reconstruction metrics, with an optional dense stereo/fusion/meshing stage for compatible hardware. Explicit measured correspondences align reconstruction coordinates to a stable right-handed, Y-up viewer world without falsely assuming monocular metric scale.
+
+Versioned scene packages reference point clouds, GLB/glTF models, camera poses, collision data, navigation grids and POIs through safe relative paths. Integrity-checked archives support reproducible transfer between a reconstruction laptop and the application laptop. A React and Three.js viewer provides Walk, Orbit and Overview modes, collision-aware first-person controls, diagnostics, quality presets, representation switching and responsive spatial controls.
+
+SpatialForge also implements persistent POIs and deterministic obstacle-aware A* navigation. Users can search destinations and view aligned routes, directional markers, progress and minimap guidance. Automatically derived navigation data is treated as a reviewable draft rather than ground truth, preserving safety when reconstruction geometry is incomplete.
+
+Verified results currently cover the software pipeline, deterministic scene, browser navigation and automated tests. A genuine room reconstruction and its physical accuracy remain pending Laptop 2 execution and are not claimed in this abstract. The intended applications include campuses, exhibitions, museums, emergency planning, accessibility guidance, facilities management and reusable indoor digital twins.

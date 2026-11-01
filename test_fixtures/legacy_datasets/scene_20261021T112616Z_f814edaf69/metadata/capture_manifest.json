@@ -1,0 +1,59 @@
+{
+  "scene_id": "scene_20261021T112616Z_f814edaf69",
+  "original_input_filename": "spatialforge_cli_fixture.mp4",
+  "video_metadata": {
+    "fps": 10.0,
+    "width": 640,
+    "height": 480,
+    "frame_count": 20,
+    "duration_seconds": 2.0
+  },
+  "extraction_config": {
+    "sample_fps": 2.0,
+    "blur_threshold": 80.0,
+    "min_width": 640,
+    "min_height": 480,
+    "max_width": 640,
+    "duplicate_threshold": 0.995,
+    "enable_blur_filter": false,
+    "enable_duplicate_filter": false,
+    "jpeg_quality": 92,
+    "dataset_root": "datasets",
+    "upload_size_limit_mb": 1024,
+    "worker_count": 2
+  },
+  "total_frames_sampled": 4,
+  "accepted_frames": 4,
+  "rejected_frames": 0,
+  "rejection_reasons": {},
+  "images": [
+    {
+      "path": "images/frame_000001.jpg",
+      "source_frame_index": 0,
+      "timestamp_seconds": 0.0,
+      "blur_score": 3628.656
+    },
+    {
+      "path": "images/frame_000002.jpg",
+      "source_frame_index": 5,
+      "timestamp_seconds": 0.5,
+      "blur_score": 2358.146
+    },
+    {
+      "path": "images/frame_000003.jpg",
+      "source_frame_index": 10,
+      "timestamp_seconds": 1.0,
+      "blur_score": 1940.384
+    },
+    {
+      "path": "images/frame_000004.jpg",
+      "source_frame_index": 15,
+      "timestamp_seconds": 1.5,
+      "blur_score": 1841.85
+    }
+  ],
+  "rejections": [],
+  "processing_duration_seconds": 0.128504,
+  "pipeline_version": "0.1.0",
+  "processing_status": "completed"
+}
