@@ -29,6 +29,17 @@ export function setStandaloneMode(enabled: boolean): void {
 }
 
 export async function listScenes(signal?: AbortSignal): Promise<SceneSummary[]> {
+  const isPublicHost = typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
+  if (isPublicHost) {
+    try {
+      const showcase = await requestJson<{ scenes: SceneSummary[] }>("/showcase/scenes.json", signal);
+      isStandaloneMode = true;
+      return showcase.scenes;
+    } catch {
+      // Fall through to backend if showcase fails
+    }
+  }
+
   try {
     const result = await requestJson<{ scenes: SceneSummary[] }>("/api/v1/scenes", signal);
     isStandaloneMode = false;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loadQualityReport, validateViewerPack } from "../api";
+import { assetUrl, loadQualityReport, validateViewerPack } from "../api";
 import type { CameraTelemetry, QualityPreset, RenderMetrics, SceneManifest, UnifiedQualityReport, ViewerPackValidation } from "../types";
 
 function metric(value: number | null | undefined, suffix = "") {
@@ -45,7 +45,7 @@ export function DiagnosticsPanel({
       .catch(() => setQualityReport(null));
 
     if (manifest.viewer?.is_2_5d) {
-      fetch(`/api/v1/scenes/${manifest.scene_id}/assets/metadata/depth_diagnostics.json`, { signal: controller.signal })
+      fetch(assetUrl(manifest.scene_id, "metadata/depth_diagnostics.json"), { signal: controller.signal })
         .then((res) => (res.ok ? res.json() : null))
         .then(setDepthDiag)
         .catch(() => setDepthDiag(null));
