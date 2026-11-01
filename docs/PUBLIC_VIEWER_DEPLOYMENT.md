@@ -1,5 +1,8 @@
 # SpatialForge — Public Showcase 3D Viewer Deployment Guide
 
+> **Live Production URL**: **[https://frontend-nine-mu-97.vercel.app](https://frontend-nine-mu-97.vercel.app)**  
+> **Status**: Live, public, zero-backend WebGL 3D reconstruction and roaming.
+
 ## Overview
 
 SpatialForge features an automated, serverless-capable **Public Showcase Mode**. When deployed to a public URL (such as Vercel, Netlify, or GitHub Pages), judges and evaluators can interact with real 3D reconstructed environments directly in their browser without requiring local installation, Python dependencies, or a running COLMAP worker.
